@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Copyright>Copyright 2021 Danilo Peres</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Logo.png</PackageIcon>
+    <RepositoryUrl>https://github.com/DaniloPeres/MonoGame.GlowEffect</RepositoryUrl>
+    <PackageTags>MonoGame Glow Effect, MonoGame Glow, MonoGame Bloom, MonoGame</PackageTags>
+    <Description>MonoGame.GlowEffect is a library to generate glow for Texture2D in MonoGame.
+We also support Sprite Font.
+We use a shader effect to process the glow effect.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Content\DirectX\GlowEffect.xnb" />
+    <None Remove="Content\GlowEffect.fx" />
+    <None Remove="Content\OpenGL\GlowEffect.xnb" />
+    <None Remove="Content\RebuildEffects.bat" />
+    <None Include="..\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Content\DirectX\GlowEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Content\OpenGL\GlowEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.Portable" Version="3.7.1.189" />
+  </ItemGroup>
+
+</Project>

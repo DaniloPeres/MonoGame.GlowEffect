@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/MonoGame.GlowEffect/bin
+/MonoGame.GlowEffect/obj
+/MonoGame.GlowEffect-Samples/bin
+/MonoGame.GlowEffect-Samples/obj
+/MonoGame.GlowEffect-Samples/Content/bin
+/MonoGame.GlowEffect-Samples/Content/obj
