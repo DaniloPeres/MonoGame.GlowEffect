@@ -20,57 +20,60 @@ namespace MonoGame
 
         public static Texture2D CreateGlow(Texture2D src, Color color, float blurX, float blurY, float dist, float angle, float alpha, float strength, float inner, float knockout, float circleSamplingTimes, float linearSamplingTimes, GraphicsDevice graphics)
         {
-            var effect = GetEffectGlow(graphics);
-
-            var size = 50;
-
-            // crate a render target with margins
-            using (var renderTargetResize = new RenderTarget2D(graphics, src.Width + size * 2, src.Height + size * 2))
+            lock (graphics)
             {
-                graphics.SetRenderTarget(renderTargetResize);
-                graphics.Clear(Color.Transparent);
+                var effect = GetEffectGlow(graphics);
 
-                using (SpriteBatch spriteBatch = new SpriteBatch(graphics))
+                var size = 50;
+
+                // crate a render target with margins
+                using (var renderTargetResize = new RenderTarget2D(graphics, src.Width + size * 2, src.Height + size * 2))
                 {
-                    // Create a new texture with the new size
-                    spriteBatch.Begin();
+                    graphics.SetRenderTarget(renderTargetResize);
+                    graphics.Clear(Color.Transparent);
 
-                    // draw the texture with the margin
-                    spriteBatch.Draw(src, new Vector2(size), Color.White);
+                    using (SpriteBatch spriteBatch = new SpriteBatch(graphics))
+                    {
+                        // Create a new texture with the new size
+                        spriteBatch.Begin();
 
-                    spriteBatch.End();
+                        // draw the texture with the margin
+                        spriteBatch.Draw(src, new Vector2(size), Color.White);
+
+                        spriteBatch.End();
+                    }
+
+                    var renderTarget = new RenderTarget2D(graphics, renderTargetResize.Width, renderTargetResize.Height);
+
+                    // Apply my effect
+                    effect.Parameters["pixelSize"].SetValue(Vector2.One / new Vector2(renderTargetResize.Width, renderTargetResize.Height));
+                    effect.Parameters["blurX"].SetValue(blurX);
+                    effect.Parameters["blurY"].SetValue(blurY);
+                    effect.Parameters["dist"].SetValue(dist);
+                    effect.Parameters["angle"].SetValue(angle);
+                    effect.Parameters["alpha"].SetValue(alpha);
+                    effect.Parameters["strength"].SetValue(strength);
+                    effect.Parameters["inner"].SetValue(inner);
+                    effect.Parameters["knockout"].SetValue(knockout);
+                    effect.Parameters["circleSamplingTimes"].SetValue(circleSamplingTimes);
+                    effect.Parameters["linearSamplingTimes"].SetValue(linearSamplingTimes);
+                    effect.Parameters["color"].SetValue(color.ToVector4());
+
+                    // Draw the img with the effect
+                    graphics.SetRenderTarget(renderTarget);
+                    graphics.Clear(Color.Transparent);
+
+                    using (SpriteBatch spriteBatch = new SpriteBatch(graphics))
+                    {
+                        //spriteBatch.Begin(SpriteSortMode.Immediate, CustomBlendStates.WriteToAlpha, effect: effect);
+                        spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, effect);
+                        spriteBatch.Draw(renderTargetResize, new Vector2(0, 0), Color.White);
+                        spriteBatch.End();
+                        graphics.SetRenderTarget(null);
+                    }
+
+                    return renderTarget;
                 }
-
-                var renderTarget = new RenderTarget2D(graphics, renderTargetResize.Width, renderTargetResize.Height);
-
-                // Apply my effect
-                effect.Parameters["pixelSize"].SetValue(Vector2.One / new Vector2(renderTargetResize.Width, renderTargetResize.Height));
-                effect.Parameters["blurX"].SetValue(blurX);
-                effect.Parameters["blurY"].SetValue(blurY);
-                effect.Parameters["dist"].SetValue(dist);
-                effect.Parameters["angle"].SetValue(angle);
-                effect.Parameters["alpha"].SetValue(alpha);
-                effect.Parameters["strength"].SetValue(strength);
-                effect.Parameters["inner"].SetValue(inner);
-                effect.Parameters["knockout"].SetValue(knockout);
-                effect.Parameters["circleSamplingTimes"].SetValue(circleSamplingTimes);
-                effect.Parameters["linearSamplingTimes"].SetValue(linearSamplingTimes);
-                effect.Parameters["color"].SetValue(color.ToVector4());
-
-                // Draw the img with the effect
-                graphics.SetRenderTarget(renderTarget);
-                graphics.Clear(Color.Transparent);
-
-                using (SpriteBatch spriteBatch = new SpriteBatch(graphics))
-                {
-                    //spriteBatch.Begin(SpriteSortMode.Immediate, CustomBlendStates.WriteToAlpha, effect: effect);
-                    spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, effect);
-                    spriteBatch.Draw(renderTargetResize, new Vector2(0, 0), Color.White);
-                    spriteBatch.End();
-                    graphics.SetRenderTarget(null);
-                }
-
-                return renderTarget;
             }
         }
 
