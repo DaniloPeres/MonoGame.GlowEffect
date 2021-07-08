@@ -11,7 +11,7 @@
 We also support Sprite Font.
 We use a shader effect to process the glow effect.</Description>
     <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
