@@ -1,112 +1,87 @@
 ﻿#if SM4
-	#define PS_PROFILE ps_4_0
-	#define VS_PROFILE vs_4_0
+    #define PS_PROFILE ps_4_0
+    #define VS_PROFILE vs_4_0
 #else
-	#define PS_PROFILE ps_3_0
-	#define VS_PROFILE vs_3_0
+    #define PS_PROFILE ps_3_0
+    #define VS_PROFILE vs_3_0
 #endif
 
-float2 pixelSize;
+const int glowWidth = 50;
+const float intensity = 10.0; // Reduced intensity for smoother effect
+const float spread = 10; // Adjusted for better spread control
+const float totalGlowMultiplier = 5.0; // Reduced to enhance transparency
+const float4 glowColor = float4(1.0f, 1.0f, 1.0f, 1.0f); // Base glow color
+const float alpha = 8; // Adjusted alpha for better transparency
+const float2 textureSize : VPOS;
 
-const float dist = 0.0;
-const float angle = 0.0;
-const float4 color = float4(0.7, 0.0, 0.4, 0.0);
-const float alpha = 1.0;
-const float blurX = 30.0;
-const float blurY = 30.0;
-const float strength = 15.0;
-const float inner = 0.0;
-const float knockout = 0.5;
-const float hideObject = 0.0;
-
-const float linearSamplingTimes = 7.0;
-const float circleSamplingTimes = 12.0;
-const float PI = 3.14159265358979323846264;
-
-sampler s0;
-
-float calc_alpha(float4 color){
-    if (length(color)>0.7){ return 1.0;}
-	return 0.0;
-}
-
-float random(float2 fragCoord, float2 scale)
+Texture2D SpriteTexture;
+sampler2D InputSampler = sampler_state
 {
-    return frac(sin(dot(fragCoord.xy, scale)) * 43758.5453);
-}
+    Texture = <SpriteTexture>;
+};
 
-float4 processBloomPS( float4 inPosition : SV_Position,
-			    float4 inColor : COLOR0,
-			    float2 coords : TEXCOORD0 ) : COLOR0
+struct VertexShaderOutput
 {
-    float2 px = pixelSize;
-    float4 ownColor = tex2D(s0, coords);
+    float4 Position : SV_POSITION;
+    float4 Color : COLOR0;
+    float2 TextureCoordinates : TEXCOORD0;
+};
+
+float4 MainPS(VertexShaderOutput input) : COLOR
+{
+    float2 pos = input.TextureCoordinates;
+    float2 uvPix = float2(1.0, 1.0) / textureSize;
+
+    float4 originalColor = tex2D(InputSampler, pos);
+
+    // If the pixel is not transparent, no need to apply glow
+    if (originalColor.a == 1.0)
+    {
+        return originalColor;
+    }
+
+    float glowFactor = 0;
+    float totalGlow = 0;
     
-    if (calc_alpha(ownColor)==0.0f) {
-        ownColor = float4(0,0,0,0);
-    }
+    int samples = 50; // Number of samples around the circle for each radius
+    float angleStep = 2.0 * 3.14159265359 / samples; // Step size for each angle in radians
 
-    float4 curColor;
-    float totalAlpha = 0.0f;
-    float maxTotalAlpha = 0.0f;
-    float curDistanceX = 0.0f;
-    float curDistanceY = 0.0f;
-    float offsetX = dist*px.x * cos(angle);
-    float offsetY = dist*px.y* sin(angle);
-
-    float cosAngle;
-    float sinAngle;
-    float offset = PI * 2.0 / circleSamplingTimes * random(coords * pixelSize, float2(12.9898, 78.233));
-
-    float stepX = blurX * px.x / linearSamplingTimes;
-    float stepY = blurY * px.y / linearSamplingTimes;
-
-    if (ownColor.a>0.5){
-        return ownColor;
-    }
-
-    // Cyclic angle sampling
-#if OPENGL
-    [unroll(7)]
-#else
-    [loop]
-#endif
-    for (float a = 0.0; a <= PI * 2.0; a += PI * 2.0 / circleSamplingTimes)
+    
+    [unroll(50)]
+    for (int i = 1; i <= glowWidth; i++)
     {
-        cosAngle = cos(a + offset);
-        sinAngle = sin(a + offset);
-        // Linear sampling
-#if OPENGL
-        [unroll(7)]
-#else
-        [loop]
-#endif
-        for (float i = 1.0; i <= linearSamplingTimes; i++) {
-            curDistanceX = i * stepX * cosAngle;
-            curDistanceY = i * stepY * sinAngle;
-            float2 uv = float2(coords.x + curDistanceX - offsetX, coords.y + curDistanceY + offsetY);
-            if (uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0){
-                curColor = tex2D(s0, uv);
-                totalAlpha += (linearSamplingTimes - i) * calc_alpha(curColor);
-            }
-            maxTotalAlpha += (linearSamplingTimes - i);
+        float weight = exp(-pow(i * (spread / 100), 2)); // Adjusted weight for smoother spread
+        
+        for (int j = 0; j < samples; j++)
+        {           
+            float angle = j * angleStep;
+            float2 offset = float2(cos(angle) * i, sin(angle) * i) * uvPix; // Calculate circular offset
+
+            float distance = length(offset);
+            float distanceWeight = 1.0 / (distance + 1.0);
+
+            float4 sampleColor = tex2D(InputSampler, pos + offset);
+            glowFactor += (sampleColor.a * weight * distanceWeight);
         }
+
+        totalGlow += weight * samples * (totalGlowMultiplier / 100); // Account for multiple samples per radius
     }
 
-    // Calculate alpha average
-    totalAlpha = totalAlpha/maxTotalAlpha;
-   
-    if (totalAlpha<0.1){
-        return ownColor;
-    }
+    glowFactor = saturate(glowFactor / totalGlow); // Normalize the glow factor
 
-    return color*totalAlpha*totalAlpha * strength;
+    // Enhance the glow effect by scaling the color
+    float4 glowEffect = glowColor * (glowFactor * (intensity / 10)); // Increase scaling factor for more intensity
+
+    glowEffect.a = glowFactor;
+
+    // Blend the glow with the original color
+    return max(originalColor, glowEffect);
 }
 
-technique Technique1
+technique SpriteDrawing
 {
-    pass P1
+    pass P0
     {
-        PixelShader = compile PS_PROFILE processBloomPS();
+        PixelShader = compile PS_PROFILE MainPS();
     }
-}
+};

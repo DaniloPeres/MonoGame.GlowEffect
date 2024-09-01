@@ -1,48 +1,43 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MonoGame.GlowEffect_Samples.Drawables
+namespace MonoGame.GlowEffect_Samples.Drawables;
+
+public class Text : IDrawable
 {
-    public class Text : IDrawable
+    public Action OnClick { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    SpriteFont spriteFont;
+    string text;
+    Vector2 position;
+    Color color;
+
+    public Text(SpriteFont spriteFont, string text, Vector2 position, Color color)
     {
-        public Action OnClick { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        this.spriteFont = spriteFont;
+        this.text = text;
+        this.position = position;
+        this.color = color;
+    }
 
-        SpriteFont spriteFont;
-        string text;
-        Vector2 position;
-        Color color;
+    public bool Collision(Vector2 pos)
+    {
+        return false;
+    }
 
-        public Text(SpriteFont spriteFont, string text, Vector2 position, Color color)
-        {
-            this.spriteFont = spriteFont;
-            this.text = text;
-            this.position = position;
-            this.color = color;
-        }
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
 
-        public bool Collision(Vector2 pos)
-        {
-            return false;
-        }
+    public void Draw(SpriteBatch spriteBatch)
+    {
+        spriteBatch.DrawString(spriteFont, text, position, color);
+    }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.DrawString(spriteFont, text, position, color);
-        }
-
-        public void SetText(string text)
-        {
-            this.text = text;
-        }
+    public void SetText(string text)
+    {
+        this.text = text;
     }
 }

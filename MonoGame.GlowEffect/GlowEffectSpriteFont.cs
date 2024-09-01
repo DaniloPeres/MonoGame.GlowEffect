@@ -7,17 +7,17 @@ namespace MonoGame
     {
         public static Texture2D transparentPixel;
 
-        public static Texture2D CreateGlowSpriteFont(SpriteFont spriteFont, string text, Color textColor, Color glowColor, Vector2 scale, float blurX, float blurY, float dist, float angle, float alpha, float strength, float inner, float knockout, float circleSamplingTimes, float linearSamplingTimes, GraphicsDevice graphics)
+        public static Texture2D CreateGlowSpriteFont(SpriteFont spriteFont, string text, Color textColor, Vector2 scale, Color glowColor, int glowWidth, float intensity, float spread, float totalGlowMultiplier)
         {
-            var textTexture2D = DrawSpriteFontToTexture2D(spriteFont, text, textColor, scale, graphics);
-            return CreateGlow(textTexture2D, glowColor, blurX, blurY, dist, angle, alpha, strength, inner, knockout, circleSamplingTimes, linearSamplingTimes, graphics);
+            var textTexture2D = DrawSpriteFontToTexture2D(spriteFont, text, textColor, scale);
+            return CreateGlow(textTexture2D, glowColor, glowWidth, intensity, spread, totalGlowMultiplier);
         }
 
-        private static Texture2D DrawSpriteFontToTexture2D(SpriteFont spriteFont, string text, Color textColor, Vector2 scale, GraphicsDevice graphics)
+        private static Texture2D DrawSpriteFontToTexture2D(SpriteFont spriteFont, string text, Color textColor, Vector2 scale)
         {
             var textSize = spriteFont.MeasureString(text) * scale;
             if (textSize.X == 0 || textSize.Y == 0)
-                return GetTransparentPixel(graphics);
+                return GetTransparentPixel();
 
             lock (graphics)
             {
@@ -35,14 +35,14 @@ namespace MonoGame
             }
         }
 
-        private static Texture2D GetTransparentPixel(GraphicsDevice graphics)
+        private static Texture2D GetTransparentPixel()
         {
             if (transparentPixel == null)
             {
                 transparentPixel = new Texture2D(graphics, 1, 1);
                 var color = new Color[1];
                 color[0] = Color.Transparent;
-                transparentPixel.SetData<Color>(color);
+                transparentPixel.SetData(color);
             }
 
             return transparentPixel;

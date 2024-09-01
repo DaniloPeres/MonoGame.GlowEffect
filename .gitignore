@@ -5,6 +5,8 @@
 /.vs
 /MonoGame.GlowEffect/bin
 /MonoGame.GlowEffect/obj
+/MonoGame.GlowEffect/Content/bin
+/MonoGame.GlowEffect/Content/obj
 /MonoGame.GlowEffect-Samples/bin
 /MonoGame.GlowEffect-Samples/obj
 /MonoGame.GlowEffect-Samples/Content/bin

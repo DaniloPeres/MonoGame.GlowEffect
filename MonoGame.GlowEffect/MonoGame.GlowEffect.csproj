@@ -1,41 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Copyright>Copyright 2021 Danilo Peres</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>Logo.png</PackageIcon>
-    <RepositoryUrl>https://github.com/DaniloPeres/MonoGame.GlowEffect</RepositoryUrl>
-    <PackageTags>MonoGame Glow Effect, MonoGame Glow, MonoGame Bloom, MonoGame</PackageTags>
-    <Description>MonoGame.GlowEffect is a library to generate glow for Texture2D in MonoGame.
-We also support Sprite Font.
-We use a shader effect to process the glow effect.</Description>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <Version>1.0.2</Version>
+    <TargetFramework>net8.0</TargetFramework>
+	  <Authors>Danilo Peres</Authors>
+	  <Company>Danilo Peres</Company>
+	  <Copyright>Copyright 2024 Danilo Peres</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageIcon>Logo.png</PackageIcon>
+	  <RepositoryUrl>https://github.com/DaniloPeres/MonoGame.GlowEffect</RepositoryUrl>
+	  <PackageTags>MonoGame Glow Effect, MonoGame Glow, MonoGame Bloom, MonoGame</PackageTags>
+	  <Description>
+		  MonoGame.GlowEffect is a library to generate glow for Texture2D in MonoGame.
+		  We also support Sprite Font.
+		  We use a shader effect to process the glow effect.
+	  </Description>
+	  <Version>1.0.5</Version>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
   <ItemGroup>
-    <None Remove="Content\DirectX\GlowEffect.xnb" />
     <None Remove="Content\GlowEffect.fx" />
-    <None Remove="Content\OpenGL\GlowEffect.xnb" />
-    <None Remove="Content\RebuildEffects.bat" />
-    <None Include="..\Logo.png">
-      <Pack>True</Pack>
+  </ItemGroup>
+  <ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="\" />
+	  <None Include="..\Logo.png" Link="Logo.png">
       <PackagePath></PackagePath>
+      <Pack>True</Pack>
     </None>
   </ItemGroup>
-
   <ItemGroup>
-    <EmbeddedResource Include="Content\DirectX\GlowEffect.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Content\OpenGL\GlowEffect.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.Portable" Version="3.7.1.189" />
-  </ItemGroup>
-
 </Project>
