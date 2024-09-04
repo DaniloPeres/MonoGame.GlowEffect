@@ -1,9 +1,9 @@
 ﻿#if SM4
-    #define PS_PROFILE ps_4_0
-    #define VS_PROFILE vs_4_0
+#define PS_PROFILE ps_4_0
+#define VS_PROFILE vs_4_0
 #else
-    #define PS_PROFILE ps_3_0
-    #define VS_PROFILE vs_3_0
+#define PS_PROFILE ps_3_0
+#define VS_PROFILE vs_3_0
 #endif
 
 const int glowWidth = 50;
@@ -12,6 +12,7 @@ const float spread = 10; // Adjusted for better spread control
 const float totalGlowMultiplier = 5.0; // Reduced to enhance transparency
 const float4 glowColor = float4(1.0f, 1.0f, 1.0f, 1.0f); // Base glow color
 const float alpha = 8; // Adjusted alpha for better transparency
+const bool hideTexture = 0; // Set to false to enable texture, true to hide texture
 const float2 textureSize : VPOS;
 
 Texture2D SpriteTexture;
@@ -27,6 +28,15 @@ struct VertexShaderOutput
     float2 TextureCoordinates : TEXCOORD0;
 };
 
+float calc_alpha(float4 color)
+{
+    if (length(color) > 0.7)
+    {
+        return 1.0;
+    }
+    return 0.0;
+}
+
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float2 pos = input.TextureCoordinates;
@@ -35,8 +45,13 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float4 originalColor = tex2D(InputSampler, pos);
 
     // If the pixel is not transparent, no need to apply glow
-    if (originalColor.a == 1.0)
+    if (calc_alpha(originalColor) == 1.0)
     {
+        if (hideTexture == 1)
+        {
+            return float4(0.0, 0.0, .0, 0.0);
+        }
+        
         return originalColor;
     }
 
@@ -53,7 +68,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
         float weight = exp(-pow(i * (spread / 100), 2)); // Adjusted weight for smoother spread
         
         for (int j = 0; j < samples; j++)
-        {           
+        {
             float angle = j * angleStep;
             float2 offset = float2(cos(angle) * i, sin(angle) * i) * uvPix; // Calculate circular offset
 

@@ -7,10 +7,10 @@ namespace MonoGame
     {
         public static Texture2D transparentPixel;
 
-        public static Texture2D CreateGlowSpriteFont(SpriteFont spriteFont, string text, Color textColor, Vector2 scale, Color glowColor, int glowWidth, float intensity, float spread, float totalGlowMultiplier)
+        public static Texture2D CreateGlowSpriteFont(SpriteFont spriteFont, string text, Color textColor, Vector2 scale, Color glowColor, int glowWidth, float intensity, float spread, float totalGlowMultiplier, bool hideTexture = false)
         {
             var textTexture2D = DrawSpriteFontToTexture2D(spriteFont, text, textColor, scale);
-            return CreateGlow(textTexture2D, glowColor, glowWidth, intensity, spread, totalGlowMultiplier);
+            return CreateGlow(textTexture2D, glowColor, glowWidth, intensity, spread, totalGlowMultiplier, hideTexture);
         }
 
         private static Texture2D DrawSpriteFontToTexture2D(SpriteFont spriteFont, string text, Color textColor, Vector2 scale)

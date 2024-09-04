@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.IO;
+using System.Reflection;
 
 namespace MonoGame;
 
@@ -17,7 +19,7 @@ public static partial class GlowEffect
         glowEffectCache = GetEffectGlow();
     }
 
-    public static Texture2D CreateGlow(Texture2D src, Color color, int glowWidth, float intensity, float spread, float totalGlowMultiplier)
+    public static Texture2D CreateGlow(Texture2D src, Color color, int glowWidth, float intensity, float spread, float totalGlowMultiplier, bool hideTexture = false)
     {
         if (glowEffectCache == null)
             throw new System.Exception("GlowEffect not initialized. Please call the InitializeAndLoad method before using this function.");
@@ -51,6 +53,7 @@ public static partial class GlowEffect
             glowEffectCache.Parameters["spread"].SetValue(spread);
             glowEffectCache.Parameters["totalGlowMultiplier"].SetValue(totalGlowMultiplier);
             glowEffectCache.Parameters["glowColor"].SetValue(color.ToVector4());
+            glowEffectCache.Parameters["hideTexture"].SetValue(hideTexture);
 
             // Draw the img with the effect
             graphics.SetRenderTarget(renderTarget);
@@ -71,6 +74,18 @@ public static partial class GlowEffect
 
     private static Effect GetEffectGlow()
     {
-        return contentManager.Load<Effect>("GlowEffect");
+        if (glowEffectCache == null)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"MonoGame.GlowEffect.Content.bin.DesktopGL.Content.GlowEffect.xnb";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            var content = new XnbContentManager(ms, graphics);
+            glowEffectCache = content.Load<Effect>();
+        }
+
+        return glowEffectCache;
     }
 }

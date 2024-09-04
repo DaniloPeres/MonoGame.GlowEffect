@@ -41,6 +41,7 @@ public class Game1 : Game
     float intensity = 30;
     float spread = 0;
     float totalGlowMultiplier = 100;
+    bool hideTexture = false;
     #endregion
 
     public Game1()
@@ -127,6 +128,9 @@ public class Game1 : Game
         pos.Y += lineSpace;
         CreateOptionNumber("Total Glow Multiplier", pos, totalGlowMultiplier, 5f, value => totalGlowMultiplier = value);
 
+        pos.Y += lineSpace;
+        CreateOptionCheckbox("Hide texture", pos, hideTexture, value => hideTexture = value);
+
         pos = new Vector2(550, 15);
 
         CreateAndAddImageObject(new Drawables.Image(imgPixel, new Rectangle(520, 15, 2, 650)))
@@ -181,6 +185,28 @@ public class Game1 : Game
             };
     }
 
+    private void CreateOptionCheckbox(string text, Vector2 pos, bool value, Action<bool> onValueChange)
+    {
+        // Create title
+        var imgObjText = new Drawables.Text(arialSpriteFont, text, pos, Color.White);
+        drawList.Add(imgObjText);
+        pos.X += arialSpriteFont.MeasureString(text).X + 15;
+
+        var imgCheckbox = Content.Load<Texture2D>("CheckBox");
+        var imgCheckboxChecked = Content.Load<Texture2D>("CheckBox_Checked");
+
+        // Create Checkbox button
+        var checkbox = CreateAndAddImageObject(new Drawables.Image(value ? imgCheckboxChecked : imgCheckbox, pos));
+        checkbox.OnClick = () =>
+            {
+                value = !value;
+                onValueChange(value);
+                checkbox.texture = value ? imgCheckboxChecked : imgCheckbox;
+                UpdateTextureOutlines();
+            };
+        pos.X += 45;
+    }
+
     private void UpdateTextureOutlines()
     {
         CreateGlow(imgObjSurge, imgSurge);
@@ -192,7 +218,7 @@ public class Game1 : Game
 
     private void CreateGlow(Drawables.Image image, Texture2D texture)
     {
-        var imageGlow = GlowEffect.CreateGlow(texture, glowColor, glowWidth, intensity, spread, totalGlowMultiplier);
+        var imageGlow = GlowEffect.CreateGlow(texture, glowColor, glowWidth, intensity, spread, totalGlowMultiplier, hideTexture);
 
         // Dispose if the previous texture is not pixel
         if (image.texture != imgPixel)
@@ -209,7 +235,7 @@ public class Game1 : Game
             return;
         lastTextFpsCount = text;
 
-        imgObjFpsText.texture = GlowEffect.CreateGlowSpriteFont(cooperBlackSpriteFont, text, Color.DarkRed, new Vector2(0.85f), glowColor, glowWidth, intensity, spread, totalGlowMultiplier);
+        imgObjFpsText.texture = GlowEffect.CreateGlowSpriteFont(cooperBlackSpriteFont, text, Color.DarkRed, new Vector2(0.85f), glowColor, glowWidth, intensity, spread, totalGlowMultiplier, hideTexture);
     }
 
     private DateTime? lastClick = null;

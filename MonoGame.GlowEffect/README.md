@@ -23,7 +23,8 @@ int glowWidth = 20;
 float intensity = 30;
 float spread = 0;
 float totalGlowMultiplier = 100;
-var textureWithGlow = GlowEffect.CreateGlow(myTexture, color, glowWidth, intensity, spread, totalGlowMultiplier);
+bool hideTexture = false;
+var textureWithGlow = GlowEffect.CreateGlow(myTexture, color, glowWidth, intensity, spread, totalGlowMultiplier, hideTexture);
 ```
 
 ## 
@@ -35,7 +36,8 @@ int glowWidth = 20;
 float intensity = 30;
 float spread = 0;
 float totalGlowMultiplier = 100;
-var textGlow = GlowEffect.CreateGlowSpriteFont(arialSpriteFont, "My Text", textColor, glowColor, glowWidth, intensity, spread, totalGlowMultiplier);
+bool hideTexture = false;
+var textGlow = GlowEffect.CreateGlowSpriteFont(arialSpriteFont, "My Text", textColor, glowColor, glowWidth, intensity, spread, totalGlowMultiplier, hideTexture);
 ```
 
 ## License
